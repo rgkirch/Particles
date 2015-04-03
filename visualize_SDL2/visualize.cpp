@@ -37,7 +37,7 @@ void make_surface( int sx, int sy )
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	
-    glPointSize( 2 );
+    glPointSize( 20 );
     glClearColor( 1, 1, 1, 1 );	
    
     glViewport (0, 0, sx, sy);
