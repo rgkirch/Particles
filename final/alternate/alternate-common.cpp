@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
-#include "common.h"
+#include "alternate-common.h"
 
 double size;
 
@@ -15,7 +15,8 @@ double size;
 #define mass    0.01
 #define cutoff  0.01
 #define min_r   (cutoff/100)
-#define dt      0.0005
+// #define dt      0.0005
+#define dt      0.00005
 
 //  timer
 double read_timer( )
@@ -69,9 +70,8 @@ void init_particles( int n, particle_t *p )
 
         //
         //  assign random velocities within a bound
-        //
-        p[i].vx = drand48()*2-1;
-        p[i].vy = drand48()*2-1;
+        p[i].vx = 1;
+        p[i].vy = 10;
     }
     free( shuffle );
 }

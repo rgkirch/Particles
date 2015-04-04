@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <math.h>
 #include <vector>
-#include "common.h"
+#include "alternate-common.h"
 
 #define density 0.0005
 #define cutoff  0.01
