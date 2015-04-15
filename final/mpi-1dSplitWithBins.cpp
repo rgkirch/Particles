@@ -1,3 +1,5 @@
+// Richard Kirchofer
+
 #include <mpi.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -112,8 +114,8 @@ int main( int argc, char **argv )
 		// printf("rank: %d mem l+(n*s): %p\n", rank, local + (nlocal * sizeof(particle_t)));
 
 		if (n_proc == 1) {
-		//if (1) {
-			// serial code
+			// if there is only one processor then there is not any binning
+			// the apply force and move are still relevant and do occur down below
 		} else {
 			// if not the first or last processor
 			if (rank < n_proc-1 && rank > 0) {
@@ -231,13 +233,11 @@ int main( int argc, char **argv )
 		  if( fsave && (step%SAVEFREQ) == 0 )
 			save( fsave, n, particles );
 
-		// BEGIN CRAZY BINING MADNESS
+		// begin bining 
 		int newLocal = nlocal + leftLength + rightLength;
 		int DIMEN = 0.3*((size/0.011) - sqrt(n));
 		if (DIMEN <= 0)
 			DIMEN = 1;
-		// if (rank == 1)
-		// 	printf("numbins: %d\n", DIMEN*DIMEN);
 		// width and height describe how many bins can fit if they are 2*cutoff square
 		/*
 		double width = size/(float)n_proc/(2.0*cutoff)
@@ -309,7 +309,7 @@ int main( int argc, char **argv )
 				}
 			}
 		}
-		// END CRAZY BINNING MADDNESS
+		// end binning 
 		
 		// printf("%d before apply\n", rank);
 		/*
