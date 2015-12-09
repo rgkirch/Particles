@@ -6,16 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <stdio.h>
-//#include <vector>
-#include <random>
-
 #include "shader.hpp"
-
-#define numberOfParticles 1000
-#define PI 3.1415926
-
-using namespace std;
 
 const GLuint WIDTH = 1920/2, HEIGHT = 1080/2;
 GLFWwindow* window;
@@ -25,33 +16,6 @@ float keyboardKeysTimeReleased[1024] = {0};
 glm::vec3 direction(0.0f, 0.0f, 0.0f);
 glm::vec3 rotation(0.0f, 0.0f, 0.0f);
 glm::mat4 view;
-
-random_device rd;
-default_random_engine generator( rd() );
-uniform_real_distribution<float> distribution(-1.0, 1.0);
-
-struct Velocity {
-	float x[numberOfParticles];
-	float y[numberOfParticles];
-	float z[numberOfParticles];
-};
-struct Position {
-	float x[numberOfParticles];
-	float y[numberOfParticles];
-	float z[numberOfParticles];
-};
-
-void initialize( float* begin, float* end) {
-	for( float* iter = begin; iter != end; ++iter) {
-		*iter = distribution( generator );
-		//printf( "%f\n", *iter );
-	}
-};
-
-void error_callback( int error, const char* description ) {
-	fprintf( stderr, "%s", description );
-	//fputs( description, stderr );
-}
 
 GLfloat normalizeCursorMovement( GLfloat movement, GLfloat range ) {
 	return (movement - floor(movement/range)*range)/range;
@@ -69,6 +33,11 @@ void fps() {
 		frames = 0;
 	}
 	++frames;
+}
+
+void error_callback( int error, const char* description ) {
+	fprintf( stderr, "%s", description );
+	//fputs( description, stderr );
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -156,14 +125,4 @@ int main() {
 	glEnable( GL_DEPTH_TEST );
 	Shader shader( "./vertexShader.glsl", "./fragmentShader.glsl" );
 
-	Velocity velocity;
-	Position position;
-	initialize( (float*)(&velocity), (float*)(&velocity)+sizeof(velocity)/sizeof(float) );
-	initialize( (float*)(&position), (float*)(&position)+sizeof(position)/sizeof(float) );
-
-	
-	return 0;
 }
-
-// thoughts - broadphase among x's, if x's are far enough apart, don't compare y's or z's
-// keep track of fastest particle, if the fastest particle couldn't cross half partition size since last repartition then safe to not repartition
