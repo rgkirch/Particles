@@ -1,35 +1,31 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 //#include <vector>
-#include <random>
 
 #define numberOfParticles 1000
 #define PI 3.1415926
 
-using namespace std;
-
-random_device rd;
-default_random_engine generator( rd() );
-uniform_real_distribution<float> distribution(-1.0, 1.0);
-
-struct Velocity {
+typedef struct {
 	float x[numberOfParticles];
 	float y[numberOfParticles];
 	float z[numberOfParticles];
-};
-struct Position {
+} Velocity;
+
+typedef struct {
 	float x[numberOfParticles];
 	float y[numberOfParticles];
 	float z[numberOfParticles];
-};
+} Position;
 
 void initialize( float* begin, float* end ) {
 	for( float* iter = begin; iter != end; ++iter ) {
-		*iter = distribution( generator );
-		//printf( "%f\n", *iter );
+		*iter = rand()/(float)RAND_MAX;
 	}
 };
 
 int main() {
+    //srand(time(NULL));
 	Velocity velocity;
 	Position position;
 	initialize( (float*)(&velocity), (float*)(&velocity)+sizeof(velocity)/sizeof(float) );
