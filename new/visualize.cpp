@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
 
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
-    int numberOfParticles = 30;
-    Position* position = init((int)numberOfParticles, (int)WIDTH, (int)HEIGHT);
+    int numberOfParticles = 300;
+    Position* position = init(numberOfParticles, WIDTH, HEIGHT);
 
     const GLfloat point[] = {0.0f, 0.0f, 0.0f};
     GLuint vbo;
