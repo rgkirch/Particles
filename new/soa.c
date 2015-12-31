@@ -1,51 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//#include <vector>
+#include "soa.h"
 
-#define DEFAULTNUMBEROFPARTICLES 500
-#define PI 3.1415926
-
-typedef struct {
-	float* x;
-	float* y;
-	float* z;
-} Velocity;
-
-typedef struct {
-	float* x;
-	float* y;
-	float* z;
-} Position;
-
-void randomize( float* beginingOfArray, float* endOfArray );
-Velocity* velocity_constructor( void );
-Position* position_constructor( void );
-
-int main(int argc, char** argv) {
+Position* init(int numberOfParticles, int width, int height) {
     //srand(time(NULL));
     //FILE* file = fopen("test", "w");
     //fprintf(file, "%f", rand()/(float)RAND_MAX);
-    int numberOfParticles;
-    //scanf("%d", &num);
-    if( argc > 1 ) {
-        numberOfParticles = atoi(argv[1]);
-    } else {
-        numberOfParticles = DEFAULTNUMBEROFPARTICLES;
-    }
-
 	Velocity velocity;
-	Position position;
-    for(int i = 0; i < 3; ++i) {
-        randomize( (float*)(&velocity), (float*)(&velocity)+sizeof(velocity)/sizeof(float) );
-    }
+	Position* position = (Position*)malloc(sizeof(Position));
+    float* pirateArrays[] = {position->x, position->y, velocity.x, velocity.y};
+    int dims[] = {width, height};
 
-	return 0;
+    //int lengthOfVels = sizeof(vels) / sizeof(float*) / numberOfParticles;
+    int numPirates = sizeof(pirateArrays) / sizeof(float*);
+    
+    for(int i = 0; i < numPirates; ++i) {
+        pirateArrays[i] = (float*)malloc(sizeof(float) * numberOfParticles);
+    }
+    for(int i = 0; i < numPirates / 2; ++i) {
+        randomize( (float*)(&pirateArrays[i]), (float*)(&pirateArrays[i])+numberOfParticles );
+        for(int v = 0; v < numberOfParticles; ++v) {
+            //pirateArrays[i][v] *= dims[i];
+            position->x[v] *= width;
+            position->y[v] *= height;
+        }
+    }
+    for(int i = numPirates / 2; i < numPirates; ++i) {
+        for(int v = 0; v < numberOfParticles; ++v) {
+            position->x[v] = (float)0.0;
+            position->y[v] = (float)0.0;
+        }
+    }
+    return position;
 }
 
-void randomize( float* begin, float* end ) {
-	for( float* iter = begin; iter != end; ++iter ) {
-		*iter = rand()/(float)RAND_MAX;
+void randomize( float* iter, float* end ) {
+    while(iter++ != end) {
+		*iter = rand()/(RAND_MAX / 2.0) - 1.0;
 	}
 };
 

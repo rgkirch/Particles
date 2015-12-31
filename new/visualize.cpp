@@ -2,127 +2,190 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 
-#include "shader.hpp"
+#include <math.h>
 
-const GLuint WIDTH = 1920/2, HEIGHT = 1080/2;
-GLFWwindow* window;
-GLboolean keyboardKeys[1024] = {GL_FALSE};
-float keyboardKeysTimePressed[1024] = {0};
-float keyboardKeysTimeReleased[1024] = {0};
-glm::vec3 direction(0.0f, 0.0f, 0.0f);
-glm::vec3 rotation(0.0f, 0.0f, 0.0f);
-glm::mat4 view;
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
-GLfloat normalizeCursorMovement( GLfloat movement, GLfloat range ) {
-	return (movement - floor(movement/range)*range)/range;
+#include "soa.h"
+
+using namespace std;
+
+void init(GLFWwindow* &theWindow, char* nameOfWindow, GLuint windowWidth, GLuint windowHeight);
+GLchar* readFile(char* fileName);
+GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName);
+void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
+void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
+
+int main(int argc, char** argv) {
+    const char* vertexShaderFileName = "vertexShader.glsl";
+    const char* fragmentShaderFileName = "fragmentShader.glsl";
+    const GLuint WIDTH = 1920*3/4, HEIGHT = 1080*3/4;
+    GLFWwindow* window;
+    init(window, argv[0], WIDTH, HEIGHT);
+
+    GLuint shaderProgram = createShader((char*)vertexShaderFileName, (char*)fragmentShaderFileName);
+    glUseProgram(shaderProgram);
+
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+
+    int numberOfParticles = 30;
+    Position* position = init(numberOfParticles, WIDTH, HEIGHT);
+
+    const GLfloat point[] = {0.0f, 0.0f, 0.0f};
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(position->x) + sizeof(position->y), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(position->x), position->x);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(position->x), sizeof(position->y), position->y);
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(position->x));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+
+	while( !glfwWindowShouldClose( window ) ) {
+		glfwPollEvents();
+		glClear( GL_COLOR_BUFFER_BIT );
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glDrawArrays(GL_POINTS, 0, numberOfParticles);
+
+        //glFlush();
+		glfwSwapBuffers( window );
+	}
+
+	glfwDestroyWindow( window );
+	glfwTerminate();
+	return 0;
 }
 
-void fps() {
-	static GLuint frames = 0;
-	static GLfloat fpsTimeout = 0.0f;
-	if( fpsTimeout == 0.0f ) {
-		fpsTimeout = glfwGetTime() + 1.0f;
-	}
-	if( glfwGetTime() > fpsTimeout ) {
-		fpsTimeout = glfwGetTime() + 1.0f;
-		printf( "%d fps\n", frames);
-		frames = 0;
-	}
-	++frames;
+// allocates memory for (shader) file contents
+GLchar* readFile(char* fileName) {
+    FILE* file = fopen(fileName, "rb");
+    if( ! file ) fprintf(stderr, "error: Could not open file %s\n", fileName);
+    long fileLength = 0;
+    fseek(file, 0, SEEK_END);
+    fileLength = ftell(file);
+    rewind(file);
+    GLchar* contents = (GLchar*)malloc(fileLength + 1);
+    if( ! contents ) fprintf(stderr, "error: Could not allocate memory.\n");
+    contents[fileLength] = '\0';
+    fread(contents, 1, fileLength, file);
+    fclose(file);
+    return contents;
 }
 
-void error_callback( int error, const char* description ) {
-	fprintf( stderr, "%s", description );
-	//fputs( description, stderr );
+GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
+    if( ! vertexShaderFileName ) fprintf(stderr, "error: NULL passed in for vertex shader file name.\n");
+    if( ! fragmentShaderFileName ) fprintf(stderr, "error: NULL passed in for fragment shader file name.\n");
+    char* sourceFileName[] = { vertexShaderFileName, fragmentShaderFileName };
+    GLint shaderEnums[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+    GLuint program = glCreateProgram();
+    if( ! program ) fprintf(stderr, "error: failed to create program\n");
+    for(int i = 0; i < 2; ++i) {
+        GLchar* shaderCode = readFile( sourceFileName[i] );
+        GLuint shader = glCreateShader( shaderEnums[i] );
+        glShaderSource( shader, 1, (const GLchar**)&shaderCode, NULL );
+        glCompileShader(shader);
+        checkShaderStepSuccess(shader, GL_COMPILE_STATUS);
+        glAttachShader(program, shader);
+        free( shaderCode );
+        //delete [] shaderCode;
+        glDeleteShader(shader);
+    }
+    glLinkProgram(program);
+    checkShaderStepSuccess(program, GL_LINK_STATUS);
+    return program;
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+void checkShaderStepSuccess(GLint program, GLuint status) {
+    GLint success = -3;
+    switch(status) {
+        case GL_COMPILE_STATUS:
+            glGetShaderiv( program, status, &success );
+            if( success == -3 ) fprintf(stderr, "error: the success check may have a false positive\n");
+            if( ! success ) {
+                printShaderLog((char*)"error: gl shader program failed to compile.", program);
+                fprintf(stderr, "Exiting.\n");
+                exit(1);
+            }
+            break;
+        case GL_LINK_STATUS:
+            glGetProgramiv( program, status, &success );
+            printf("success value %d\n", success);
+            if( success == -3 ) fprintf(stderr, "error: the success check may have a false positive\n");
+            if( ! success ) {
+                printShaderLog((char*)"error: gl shader program failed to link.", program);
+                //fprintf(stderr, "Exiting.\n");
+                //exit(1);
+            }
+            break;
+        default:
+            fprintf(stderr, "function called with unhandled case.\n");
+            break;
+    }
 }
 
-static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
-	printf("key action\n");
-	if( key > 1023 ) {
-		fprintf( stderr, "key input %d too large", key );
-		key = 1023;
-	}
-	if( scancode > 1023 ) {
-		fprintf( stderr, "scancode input %d too large", scancode );
-		scancode = 1023;
-	}
-	if( action == GLFW_PRESS ) {
-		keyboardKeys[key] = GL_TRUE;
-		keyboardKeysTimePressed[key] = glfwGetTime();
-		if( key == GLFW_KEY_ESCAPE ) {
-			glfwSetWindowShouldClose( window, GL_TRUE );
-		}
-	} else if( action == GLFW_RELEASE ) {
-		keyboardKeys[key] = GL_FALSE;
-		keyboardKeysTimeReleased[key] = glfwGetTime();
-	}
+void printShaderLog(char* errorMessage, GLuint shader) {
+    fprintf(stderr, "%s\n", errorMessage);
+    GLint length = 0;
+    glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
+    printf("log length %d\n", length);
+    GLchar* logText = (GLchar*)malloc(sizeof(GLchar) * (length + 1));
+    logText[length] = '\0';
+    glGetShaderInfoLog(shader, length, &length, logText);
+    printf("printing log\n");
+    //fprintf(stderr, "%s", logText);
+    cout << logText << endl;
+    free(logText);
 }
 
-void updateCamera() {
-	// TODO handle overflow, can use glfwSetCursorPos
-	double xpos, ypos;
-	xpos = ypos = 0;
-	glfwGetCursorPos( window, &xpos, &ypos );
-	GLfloat temp;
-	temp = normalizeCursorMovement( xpos, WIDTH * 4 ) * 2 * PI;
-	rotation.y = temp;
-	direction.x = sin( temp );
-	direction.z = -cos( temp );
-	temp = normalizeCursorMovement( ypos, WIDTH * 4 ) * 2 * PI;
-	rotation.x = temp;
-	//printf( "direction x %f, y %f, z %f\n", direction.x, direction.y, direction.z );
-	
-	glm::mat4 tempMat;
-	if( keyboardKeys[GLFW_KEY_W] ) {
-		//TODO finish this
-		view = glm::translate( view, -1.0f * (GLfloat)(glfwGetTime() - keyboardKeysTimePressed[GLFW_KEY_W]) * direction );
-	}
-	if( keyboardKeys[GLFW_KEY_S] ) {
-		view = glm::translate( view, (GLfloat)(glfwGetTime() - keyboardKeysTimePressed[GLFW_KEY_S]) * direction );
-	}
-	if( keyboardKeys[GLFW_KEY_A] ) {
-		//view = glm::translate( view, glm::vec3( direction.x, direction.y, direction.z) );
-	}
-	if( keyboardKeys[GLFW_KEY_D] ) {
-	}
-	if( keyboardKeys[GLFW_KEY_Q] ) {
-	}
-	if( keyboardKeys[GLFW_KEY_E] ) {
-	}
-}
-
-int main() {
-	glfwSetErrorCallback( error_callback );
+void init(GLFWwindow* &window, char* name, GLuint width, GLuint height) {
+	/* Initialize the library */
 	if ( !glfwInit() ) {
-		return -1;
+        fprintf(stderr, "GLFW failed to init.\n");
+        fprintf(stderr, "Exiting.\n");
+        exit(1);
 	}
+
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
-	window = glfwCreateWindow( WIDTH, HEIGHT, "particle simulation", nullptr, nullptr );
+
+	/* Create a windowed mode window and its OpenGL context */
+	window = glfwCreateWindow( width, height, name, NULL, NULL );
 	if ( !window ) {
 		glfwTerminate();
-		return -1;
+        fprintf(stderr, "GLFW failed to create the window.\n");
+        fprintf(stderr, "Exiting.\n");
+        exit(1);
 	}
 	glfwMakeContextCurrent( window );
-	glfwSetKeyCallback( window, key_callback );
-	glfwSetScrollCallback(window, scroll_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
-		fprintf( stderr, "glewInit() failed\n" );
+        fprintf(stderr, "GLEW failed to init.\n");
+        fprintf(stderr, "Exiting.\n");
+        exit(1);
 	}
-	glViewport( 0, 0, WIDTH, HEIGHT );
-	glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
-	glEnable( GL_DEPTH_TEST );
-	Shader shader( "./vertexShader.glsl", "./fragmentShader.glsl" );
 
+	glViewport( 0, 0, width, height );
+
+    printf( "VENDOR = %s\n", glGetString( GL_VENDOR ) ) ;
+    printf( "RENDERER = %s\n", glGetString( GL_RENDERER ) ) ;
+    printf( "VERSION = %s\n", glGetString( GL_VERSION ) ) ;
 }
