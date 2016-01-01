@@ -24,7 +24,7 @@ Position* init(int numberOfParticles, int width, int height) {
     for(int i = 0; i < numPirates / 2; ++i) {
         randomize( (*pirateArrays[i]), (*pirateArrays[i])+numberOfParticles );
         for(int v = 0; v < numberOfParticles; ++v) {
-            //(*pirateArrays[i])[v] *= dims[i];
+            (*pirateArrays[i])[v] *= dims[i];
             //position->x[v] *= width;
             //position->y[v] *= height;
         }
@@ -41,7 +41,7 @@ Position* init(int numberOfParticles, int width, int height) {
 void randomize( GLfloat* iter, GLfloat* end ) {
     while(iter != end) {
 		*iter = rand()/(RAND_MAX / 2.0) - 1.0;
-        printf("%.2f, ", *iter);
+        //printf("%.2f, ", *iter);
         ++iter;
 	}
 };
