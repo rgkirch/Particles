@@ -75,7 +75,6 @@ int main(int argc, char** argv) {
         glDrawArrays(GL_POINTS, 0, numberOfParticles);
         step();
 
-        //glFlush();
 		glfwSwapBuffers( window );
 	}
 

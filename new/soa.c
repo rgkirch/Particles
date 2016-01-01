@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "soa.h"
 
 int numberOfParticles;
@@ -9,8 +10,12 @@ struct Velocity velocity ;
 void randomize( GLfloat* beginingOfArray, GLfloat* endOfArray );
 
 void step() {
+    int sign = 0;
     for(int i = 0; i < numberOfParticles; ++i) {
-        position.x[i] += .01f;
+        position.x[i] += velocity.x[i]/50;
+        position.y[i] += velocity.y[i]/50;
+        position.x[i] = fmod(position.x[i], 1.0);
+        position.y[i] = fmod(position.y[i], 1.0);
     }
 }
 
@@ -33,8 +38,8 @@ void particleInit() {
     }
     for(int i = numPirates / 2; i < numPirates; ++i) {
         for(int v = 0; v < numberOfParticles; ++v) {
-            velocity.x[v] = (GLfloat)(rand()/RAND_MAX)/10;
-            velocity.y[v] = (GLfloat)(rand()/RAND_MAX)/10;
+            velocity.x[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0);
+            velocity.y[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0);
         }
     }
 }
