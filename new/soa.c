@@ -3,7 +3,7 @@
 #include <time.h>
 #include "soa.h"
 
-void step() {
+void step(void) {
     //numberOfParticles;
     //printf("%d\n", numberOfParticles);
 }

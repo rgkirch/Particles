@@ -12,9 +12,9 @@
 
 #include <math.h>
 
-#include <fstream>
-#include <sstream>
-#include <iostream>
+//#include <fstream>
+//#include <sstream>
+//#include <iostream>
 
 #include "soa.h"
 
@@ -156,8 +156,8 @@ void printShaderLog(char* errorMessage, GLuint shader) {
     logText[length] = '\0';
     glGetShaderInfoLog(shader, length, &length, logText);
     printf("printing log\n");
-    //fprintf(stderr, "%s", logText);
-    cout << logText << endl;
+    fprintf(stderr, "%s", logText);
+    //cout << logText << endl;
     free(logText);
 }
 
@@ -193,7 +193,7 @@ void init(GLFWwindow* &window, char* name, GLuint width, GLuint height) {
 
 	glViewport( 0, 0, width, height );
 
-    printf( "VENDOR = %s\n", glGetString( GL_VENDOR ) ) ;
-    printf( "RENDERER = %s\n", glGetString( GL_RENDERER ) ) ;
-    printf( "VERSION = %s\n", glGetString( GL_VERSION ) ) ;
+    //printf( "VENDOR = %s\n", glGetString( GL_VENDOR ) ) ;
+    //printf( "RENDERER = %s\n", glGetString( GL_RENDERER ) ) ;
+    //printf( "VERSION = %s\n", glGetString( GL_VERSION ) ) ;
 }
