@@ -3,12 +3,11 @@
 #include <time.h>
 #include "soa.h"
 
-Position* init(int numberOfParticles, int width, int height) {
+Position* init(int numberOfParticles) {
 	Velocity velocity;
 	Position* position = (Position*)malloc(sizeof(Position));
     if(position == NULL) fprintf(stderr, "Failed to allocate memory for position.\nExiting.\n"), exit(1);
     GLfloat** pirateArrays[] = {&position->x, &position->y, &velocity.x, &velocity.y};
-    int dims[] = {width, height};
 
     //int lengthOfVels = sizeof(vels) / sizeof(GLfloat*) / numberOfParticles;
     int numPirates = sizeof(pirateArrays) / sizeof(GLfloat*);
@@ -20,11 +19,6 @@ Position* init(int numberOfParticles, int width, int height) {
     }
     for(int i = 0; i < numPirates / 2; ++i) {
         randomize( (*pirateArrays[i]), (*pirateArrays[i])+numberOfParticles );
-        for(int v = 0; v < numberOfParticles; ++v) {
-            (*pirateArrays[i])[v] *= dims[i];
-            //position->x[v] *= width;
-            //position->y[v] *= height;
-        }
     }
     for(int i = numPirates / 2; i < numPirates; ++i) {
         for(int v = 0; v < numberOfParticles; ++v) {

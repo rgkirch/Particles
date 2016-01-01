@@ -27,23 +27,25 @@ void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
 void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
 
 int main(int argc, char** argv) {
+    int numberOfParticles = 100;
+    if(argc > 1) {
+        numberOfParticles = atoi(argv[1]);
+    }
     const char* vertexShaderFileName = "vertexShader.glsl";
     const char* fragmentShaderFileName = "fragmentShader.glsl";
     //const GLuint WIDTH = 1920*3/4, HEIGHT = 1080*3/4;
     //const GLuint WIDTH = 1366*3/4, HEIGHT = 768*3/4;
     const GLuint WIDTH = 1366, HEIGHT = 768;
     GLFWwindow* window;
-    init(window, argv[0], WIDTH, HEIGHT);
+    init(window, argv[0], HEIGHT, HEIGHT);
 
     GLuint shaderProgram = createShader((char*)vertexShaderFileName, (char*)fragmentShaderFileName);
     glUseProgram(shaderProgram);
 
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
-    int numberOfParticles = 1000;
     long numberOfBytes = sizeof(GLfloat)*numberOfParticles;
-    Position* position = init(numberOfParticles, WIDTH, HEIGHT);
-    //GLfloat point[] = {-0.57, -0.83, -0.47, -0.85, 0.31, 0.29, -0.29, -1.00, 0.91, 0.45, 0.19, 0.80, -0.91, 0.26, 0.92, 0.75, 0.43, -0.12, 0.62, -0.41};
+    Position* position = init(numberOfParticles);
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

@@ -16,7 +16,7 @@ typedef struct {
 
 void randomize( GLfloat* beginingOfArray, GLfloat* endOfArray );
 // dimension is like the width of the area
-Position* init(int numberOfParticles, int width, int height);
+Position* init(int numberOfParticles);
 
 
 // thoughts - broadphase among x's, if x's are far enough apart, don't compare y's or z's
