@@ -42,17 +42,21 @@ int main(int argc, char** argv) {
     int numberOfParticles = 10;
     long numberOfBytes = sizeof(GLfloat)*numberOfParticles;
     Position* position = init(numberOfParticles, WIDTH, HEIGHT);
-    //GLfloat point[] = {-0.57, -0.83, -0.47, -0.85, 0.31, 0.29, -0.29, -1.00, 0.91, 0.45, 0.19, 0.80, -0.91, 0.26, 0.92, 0.75, 0.43, -0.12, 0.62, -0.41};
+    typedef struct {
+        GLfloat x[10] = {-0.57, -0.83, -0.47, -0.85, 0.31, 0.29, -0.29, -1.00, 0.91, 0.45};
+        GLfloat y[10] = { 0.19, 0.80, -0.91, 0.26, 0.92, 0.75, 0.43, -0.12, 0.62, -0.41};
+    } Point;
+    Point point;
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, numberOfBytes * 2, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
-    glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(point.x) + sizeof(point.y), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(point.x), point.x);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(point.x), sizeof(point.y), point.y);
     GLuint vao;
     glGenVertexArrays(1, &vao);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)numberOfBytes);
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(point.y));
     printf("num bytes %lu\n", numberOfBytes);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
