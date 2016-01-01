@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, numberOfBytes * 2, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, numberOfBytes * 2, NULL, GL_STREAM_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
     glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
     GLuint vao;
