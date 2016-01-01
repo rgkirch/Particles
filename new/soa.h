@@ -7,21 +7,22 @@
 #include <stdlib.h>
 #include <time.h>
 
-typedef struct {
+struct Position {
 	GLfloat* x;
 	GLfloat* y;
-} Position;
+};
 
-typedef struct {
+struct Velocity {
 	GLfloat* x;
 	GLfloat* y;
-} Velocity;
+};
 
-int numberOfParticles;
+extern int numberOfParticles;
+extern struct Position position;
+extern struct Velocity velocity;
 
-void randomize( GLfloat* beginingOfArray, GLfloat* endOfArray );
 // dimension is like the width of the area
-Position* init(int numberOfParticles);
+void particleInit(void);
 void step(void);
 
 #endif

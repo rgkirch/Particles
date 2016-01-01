@@ -3,16 +3,22 @@
 #include <time.h>
 #include "soa.h"
 
-void step(void) {
-    //numberOfParticles;
-    //printf("%d\n", numberOfParticles);
+int numberOfParticles;
+struct Position position;
+struct Velocity velocity ;
+void randomize( GLfloat* beginingOfArray, GLfloat* endOfArray );
+
+void step() {
+    for(int i = 0; i < numberOfParticles; ++i) {
+        position.x[i] += .01f;
+    }
 }
 
-Position* init(int numberOfParticles) {
-	Velocity velocity;
-	Position* position = (Position*)malloc(sizeof(Position));
-    if(position == NULL) fprintf(stderr, "Failed to allocate memory for position.\nExiting.\n"), exit(1);
-    GLfloat** pirateArrays[] = {&position->x, &position->y, &velocity.x, &velocity.y};
+void particleInit() {
+	//position = (Position*)malloc(sizeof(Position));
+	//velocity = (Velocity*)malloc(sizeof(Velocity));
+    //if(position == NULL) fprintf(stderr, "Failed to allocate memory for position.\nExiting.\n"), exit(1);
+    GLfloat** pirateArrays[] = {&position.x, &position.y, &velocity.x, &velocity.y};
 
     //int lengthOfVels = sizeof(vels) / sizeof(GLfloat*) / numberOfParticles;
     int numPirates = sizeof(pirateArrays) / sizeof(GLfloat*);
@@ -27,11 +33,10 @@ Position* init(int numberOfParticles) {
     }
     for(int i = numPirates / 2; i < numPirates; ++i) {
         for(int v = 0; v < numberOfParticles; ++v) {
-            velocity.x[v] = (GLfloat)0.0;
-            velocity.y[v] = (GLfloat)0.0;
+            velocity.x[v] = (GLfloat)(rand()/RAND_MAX)/10;
+            velocity.y[v] = (GLfloat)(rand()/RAND_MAX)/10;
         }
     }
-    return position;
 }
 
 void randomize( GLfloat* iter, GLfloat* end ) {

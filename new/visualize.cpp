@@ -26,6 +26,10 @@ GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName);
 void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
 void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
 
+extern int numberOfParticles;
+extern struct Position position;
+extern struct Velocity velocity;
+
 int main(int argc, char** argv) {
     numberOfParticles = 100;
     if(argc > 1) {
@@ -45,13 +49,13 @@ int main(int argc, char** argv) {
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
     long numberOfBytes = sizeof(GLfloat)*numberOfParticles;
-    Position* position = init(numberOfParticles);
+    particleInit();
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, numberOfBytes * 2, NULL, GL_STREAM_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
-    glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position.x);
+    glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position.y);
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -66,8 +70,8 @@ int main(int argc, char** argv) {
 		glClear( GL_COLOR_BUFFER_BIT );
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
-        glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position.x);
+        glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position.y);
         glDrawArrays(GL_POINTS, 0, numberOfParticles);
         step();
 
