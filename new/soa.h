@@ -7,16 +7,14 @@
 typedef struct {
 	GLfloat* x;
 	GLfloat* y;
-	//float* z;
 } Position;
 
 typedef struct {
 	GLfloat* x;
 	GLfloat* y;
-	//float* z;
 } Velocity;
 
-void randomize( float* beginingOfArray, float* endOfArray );
+void randomize( GLfloat* beginingOfArray, GLfloat* endOfArray );
 // dimension is like the width of the area
 Position* init(int numberOfParticles, int width, int height);
 

@@ -4,9 +4,6 @@
 #include "soa.h"
 
 Position* init(int numberOfParticles, int width, int height) {
-    //srand(time(NULL));
-    //FILE* file = fopen("test", "w");
-    //fprintf(file, "%f", rand()/(GLfloat)RAND_MAX);
 	Velocity velocity;
 	Position* position = (Position*)malloc(sizeof(Position));
     if(position == NULL) fprintf(stderr, "Failed to allocate memory for position.\nExiting.\n"), exit(1);

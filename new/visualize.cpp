@@ -30,7 +30,8 @@ int main(int argc, char** argv) {
     const char* vertexShaderFileName = "vertexShader.glsl";
     const char* fragmentShaderFileName = "fragmentShader.glsl";
     //const GLuint WIDTH = 1920*3/4, HEIGHT = 1080*3/4;
-    const GLuint WIDTH = 1366*3/4, HEIGHT = 768*3/4;
+    //const GLuint WIDTH = 1366*3/4, HEIGHT = 768*3/4;
+    const GLuint WIDTH = 1366, HEIGHT = 768;
     GLFWwindow* window;
     init(window, argv[0], WIDTH, HEIGHT);
 
@@ -39,23 +40,21 @@ int main(int argc, char** argv) {
 
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
-    //int numberOfParticles = 10;
-    //long numberOfBytes = sizeof(GLfloat)*numberOfParticles;
-    //Position* position = init(numberOfParticles, WIDTH, HEIGHT);
-    GLfloat x[9] = {-0.57, -0.83, -0.47, -0.85, 0.31, 0.29, -0.29, -1.00, 0.91};
-    GLfloat y[9] = { 0.19, 0.80, -0.91, 0.26, 0.92, 0.75, 0.43, -0.12, 0.62};
+    int numberOfParticles = 1000;
+    long numberOfBytes = sizeof(GLfloat)*numberOfParticles;
+    Position* position = init(numberOfParticles, WIDTH, HEIGHT);
+    //GLfloat point[] = {-0.57, -0.83, -0.47, -0.85, 0.31, 0.29, -0.29, -1.00, 0.91, 0.45, 0.19, 0.80, -0.91, 0.26, 0.92, 0.75, 0.43, -0.12, 0.62, -0.41};
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(x) + sizeof(y), NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(x), x);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(x), sizeof(y), y);
+    glBufferData(GL_ARRAY_BUFFER, numberOfBytes * 2, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
+    glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, NULL);
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(y));
-    //printf("num bytes %lu\n", numberOfBytes);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, (GLvoid*)numberOfBytes);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
@@ -65,7 +64,7 @@ int main(int argc, char** argv) {
 		glClear( GL_COLOR_BUFFER_BIT );
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glDrawArrays(GL_POINTS, 0, 9);
+        glDrawArrays(GL_POINTS, 0, numberOfParticles);
 
         //glFlush();
 		glfwSwapBuffers( window );
