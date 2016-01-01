@@ -1,16 +1,18 @@
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 typedef struct {
-	float* x;
-	float* y;
+	GLfloat* x;
+	GLfloat* y;
 	//float* z;
 } Position;
 
 typedef struct {
-	float* x;
-	float* y;
+	GLfloat* x;
+	GLfloat* y;
 	//float* z;
 } Velocity;
 
