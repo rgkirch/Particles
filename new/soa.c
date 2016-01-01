@@ -3,6 +3,11 @@
 #include <time.h>
 #include "soa.h"
 
+void step() {
+    //numberOfParticles;
+    //printf("%d\n", numberOfParticles);
+}
+
 Position* init(int numberOfParticles) {
 	Velocity velocity;
 	Position* position = (Position*)malloc(sizeof(Position));

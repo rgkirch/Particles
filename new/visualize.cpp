@@ -27,7 +27,7 @@ void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
 void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
 
 int main(int argc, char** argv) {
-    int numberOfParticles = 100;
+    numberOfParticles = 100;
     if(argc > 1) {
         numberOfParticles = atoi(argv[1]);
     }
@@ -66,7 +66,10 @@ int main(int argc, char** argv) {
 		glClear( GL_COLOR_BUFFER_BIT );
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, numberOfBytes, position->x);
+        glBufferSubData(GL_ARRAY_BUFFER, numberOfBytes, numberOfBytes, position->y);
         glDrawArrays(GL_POINTS, 0, numberOfParticles);
+        step();
 
         //glFlush();
 		glfwSwapBuffers( window );
