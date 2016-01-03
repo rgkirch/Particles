@@ -45,8 +45,8 @@ void step() {
         }
     }
     for(int i = 0; i < numberOfParticles; ++i) {
-        position.x[i] += velocity.x[i]/50;
-        position.y[i] += velocity.y[i]/50;
+        position.x[i] += velocity.x[i];
+        position.y[i] += velocity.y[i];
     }
     printf("collisions %d\tclose %d\n", totalNumberOfCollisions, closeCalls);
 }
@@ -70,8 +70,8 @@ void particleInit() {
     }
     for(int i = numPirates / 2; i < numPirates; ++i) {
         for(int v = 0; v < numberOfParticles; ++v) {
-            velocity.x[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0);
-            velocity.y[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0);
+            velocity.x[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0) / 64;
+            velocity.y[v] = (GLfloat)(rand()/(RAND_MAX / 2.0) - 1.0) / 64;
         }
     }
 }
