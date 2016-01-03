@@ -18,8 +18,11 @@ struct Velocity {
 };
 
 extern int numberOfParticles;
+extern unsigned int screenWidth;
+extern unsigned int screenHeight;
 extern struct Position position;
 extern struct Velocity velocity;
+extern float timeStep;
 
 // dimension is like the width of the area
 void particleInit(void);

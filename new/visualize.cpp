@@ -25,8 +25,11 @@ GLchar* readFile(char* fileName);
 GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName);
 void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
 void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
+void windowSize(GLFWwindow*, int width, int height);
 
 extern int numberOfParticles;
+extern unsigned int screenWidth;
+extern unsigned int screenHeight;
 extern struct Position position;
 extern struct Velocity velocity;
 
@@ -186,6 +189,7 @@ void init(GLFWwindow* &window, char* name, GLuint width, GLuint height) {
         exit(1);
 	}
 	glfwMakeContextCurrent( window );
+    glfwSetWindowSizeCallback(window, windowSize);
 
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
@@ -199,4 +203,11 @@ void init(GLFWwindow* &window, char* name, GLuint width, GLuint height) {
     //printf( "VENDOR = %s\n", glGetString( GL_VENDOR ) ) ;
     //printf( "RENDERER = %s\n", glGetString( GL_RENDERER ) ) ;
     //printf( "VERSION = %s\n", glGetString( GL_VERSION ) ) ;
+}
+
+void windowSize(GLFWwindow* window, int width, int height) {
+    printf("w %d h %d\n", width, height);
+    screenWidth = width;
+    screenHeight = height;
+    //glfwSetWindowSize(window, width, height);
 }
